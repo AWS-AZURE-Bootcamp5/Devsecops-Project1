@@ -53,16 +53,16 @@ stage("Docker Build & Push"){
             steps{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker build -t 2048 ."
-                       sh "docker tag 2048 sevenajay/2048:latest "
-                       sh "docker push sevenajay/2048:latest "
+                       sh "docker build -t devsecops_ad ."
+                       sh "docker tag 2048 praveensingam1994/devsecops_ad:latest "
+                       sh "docker push praveensingam1994/devsecops_ad:latest "
                     }
                 }
             }
         }
         stage("TRIVY"){
             steps{
-                sh "trivy image sevenajay/2048:latest > trivy.txt" 
+                sh "trivy image praveensingam1994/devsecops_ad:latest > trivy.txt" 
             }
         }
     }
