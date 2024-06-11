@@ -56,14 +56,10 @@ pipeline {
             }
         }
          stage('Docker Build') {
-            steps {
-                script {
-                     {
+            steps {            
                         sh "docker build -t devsecops_ad ."
                         sh "docker tag devsecops_ad:latest bhaluk/devsecops_ad:latest"
                         sh "docker push bhaluk/devsecops_ad:latest"
-                    }
-                }
             }
         }
         stage('Docker Build & Push') {
