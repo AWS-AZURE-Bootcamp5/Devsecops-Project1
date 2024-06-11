@@ -64,7 +64,7 @@ pipeline {
         stage('Docker Push') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'jenkins-docker', url: 'https://docker.io/') {
+                        docker.withRegistry('https://index.docker.io/v1/', 'jenkins-docker'){
                         sh "docker push bhaluk/devsecops_ad:latest1"
                     }
                 }
