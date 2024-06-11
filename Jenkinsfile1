@@ -58,7 +58,7 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'jenkins-docker', toolName: 'docker') {
+                    withDockerRegistry(credentialsId: 'jenkins-docker', url: 'https://hub.docker.com/') {
                         sh "docker build -t devsecops_ad ."
                         sh "docker tag devsecops_ad:latest bhaluk/devsecops_ad:latest"
                         sh "docker push bhaluk/devsecops_ad:latest"
