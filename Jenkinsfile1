@@ -85,7 +85,6 @@ pipeline {
                 sh 'kubectl apply -f deployment.yaml'
                 }
             }
-        }
         stage('View Results') {
             steps {
                 echo "Trivy File System Scan Results:"
