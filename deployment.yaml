@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: react-app-container
-          image: sevenajay/2048:latest  # Use your actual Docker image name and tag
+          image: bhaluk/devsecops_ad:V1.0.1  # Use your actual Docker image name and tag
           ports:
             - containerPort: 3000  # The port your React app is listening on
 
