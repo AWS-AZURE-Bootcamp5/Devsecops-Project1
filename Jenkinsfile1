@@ -58,14 +58,14 @@ pipeline {
          stage('Docker Build') {
             steps {            
                         sh "docker build -t devsecops_ad ."
-                        sh "docker tag devsecops_ad:latest bhaluk/devsecops_ad:latest1"    
+                        sh "docker tag devsecops_ad:latest bhaluk/devsecops_ad:V1.0.1"    
             }
         }
         stage('Docker Push') {
             steps {
                 script {
                         docker.withRegistry('https://index.docker.io/v1/', 'devops-docker'){
-                        sh "docker push bhaluk/devsecops_ad:latest1"
+                        sh "docker push bhaluk/devsecops_ad:V1.0.1"
                     }
                 }
             }
@@ -77,7 +77,7 @@ pipeline {
         }
         stage('Deploy to Container') {
             steps {
-                sh 'docker run -d --name 2048 -p 3000:3000 bhaluk/devsecops_ad:latest'
+                sh 'docker run -d --name 2048 -p 3000:3000 bhaluk/devsecops_ad:V1.0.1'
             }
         }
         stage('Deploy to Kubernetes') {
