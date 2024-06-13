@@ -77,7 +77,7 @@ pipeline {
         }
         stage('Deploy to Container') {
             steps {
-                sh 'docker run -d --name 2048 -p 3000:3000 bhaluk/devsecops_ad:V1.0.2'
+                sh 'docker run -d --name 2049 -p 3000:3000 bhaluk/devsecops_ad:V1.0.2'
             }
         }
         stage('Deploy to Kubernetes') {
