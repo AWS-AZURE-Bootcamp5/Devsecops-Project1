@@ -1,3 +1,5 @@
+deployment.yaml
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -30,5 +32,4 @@ spec:
     - protocol: TCP
       port: 80  # The port exposed by the service within the cluster
       targetPort: 3000  # The port your React app is listening on inside the pod
-      nodePort: 30036  # The NodePort to access the service from outside the cluster
-  type: NodePort  # Change the service type to NodePort
+  type: LoadBalancer
