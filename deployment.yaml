@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: react-app-deployment
 spec:
-  replicas: 3  # Adjust the number of replicas as needed
+  replicas: 2  # Adjust the number of replicas as needed
   selector:
     matchLabels:
       app: react-app
