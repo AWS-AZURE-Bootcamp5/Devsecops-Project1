@@ -30,4 +30,4 @@ spec:
     - protocol: TCP
       port: 80  # The port exposed by the service within the cluster
       targetPort: 3000  # The port your React app is listening on inside the pod
-  type: LoadBalancer
+  type: NodePort
