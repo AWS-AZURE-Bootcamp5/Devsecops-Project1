@@ -1,84 +1,100 @@
-pipeline{
-    agent any
-    tools{
+pipeline {
+    agent {
+        label 'worker'
+    }
+    tools {
         jdk 'jdk17'
         nodejs 'node16'
     }
     environment {
-        SCANNER_HOME=tool 'sonar-scanner'
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
+    options {
+        timestamps() // Enables TimeStamper
     }
     stages {
-        stage('clean workspace'){
-            steps{
+        stage('Clean Workspace') {
+            steps {
                 cleanWs()
             }
         }
-        stage('Checkout from Git'){
-            steps{
-                git branch: 'main', url: 'https://github.com/AWS-AZURE-Bootcamp5/Devsecops-Project1.git'
+        stage('Checkout from Git') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Bhaluk/Devsecops-Project1.git'
             }
         }
-        stage("Sonarqube Analysis "){
-            steps{
+        stage('SonarQube Analysis') {
+            steps {
                 withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Game \
-                    -Dsonar.projectKey=Game '''
+                    sh '''$SCANNER_HOME/bin/sonar-scanner \
+                    -Dsonar.projectName=jenkins \
+                    -Dsonar.projectKey=jenkins'''
                 }
             }
         }
-        stage("quality gate"){
-           steps {
+        stage('Quality Gate') {
+            steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
+                    timeout(time: 5, unit: 'MINUTES') { // Adjust timeout as needed
+                        waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+                    }
                 }
-            } 
+            }
         }
         stage('Install Dependencies') {
             steps {
                 sh "npm install"
             }
         }
-stage('OWASP FS SCAN') {
+        stage('OWASP Dependency Check') {
             steps {
                 dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
-        stage('TRIVY FS SCAN') {
+        stage('Trivy File System Scan') {
             steps {
                 sh "trivy fs . > trivyfs.txt"
             }
         }
-stage("Docker Build & Push"){
-            steps{
-                script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker build -t devsecops_ad ."
-                       sh "docker tag devsecops_ad praveensingam1994/devsecops_ad:latest "
-                       sh "docker push praveensingam1994/devsecops_ad:latest "
+         stage('Docker Build') {
+            steps {            
+                        sh "docker build -t devsecops_ad ."
+                        sh "docker tag devsecops_ad:latest bhaluk/devsecops_ad:V1.0.2"    
+            }
+        }
+        stage('Docker Push') {
+            steps {
+                script {
+                        docker.withRegistry('https://index.docker.io/v1/', 'devops-docker'){
+                        sh "docker push bhaluk/devsecops_ad:V1.0.2"
                     }
                 }
             }
         }
-        stage("TRIVY"){
-            steps{
-                sh "trivy image praveensingam1994/devsecops_ad:latest > trivy.txt" 
+        stage('Trivy Image Scan') {
+            steps {
+                sh "trivy image bhaluk/devsecops_ad:latest > trivy.txt"
             }
         }
-stage('Deploy to container'){
-            steps{
-                sh 'docker run -d --name 2048 -p 3000:3000 praveensingam1994/devsecops_ad:latest'
+        stage('Deploy to Container') {
+            steps {
+                sh 'docker run -d --name 2049 -p 3000:3000 bhaluk/devsecops_ad:V1.0.2'
             }
         }
-stage('Deploy to kubernets'){
-            steps{
-                script{
-                    withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                       sh 'kubectl apply -f deployment.yaml'
-                  }
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f deployment.yaml'
                 }
             }
+        stage('View Results') {
+            steps {
+                echo "Trivy File System Scan Results:"
+                sh "cat trivyfs.txt"
+                
+                echo "Trivy Image Scan Results:"
+                sh "cat trivy.txt"
+            }
         }
-
     }
 }
